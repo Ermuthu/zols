@@ -4,7 +4,7 @@ import { JSONPath } from "../../../node_modules/jsonpath-plus/dist/index-browser
 class DataWarehouseScreen {
 	constructor() {
 		// Set an option globally
-		JSONEditor.defaults.options.theme = "bootstrap4";
+		JSONEditor.defaults.options.theme = "bootstrap5";
 
 		this.dataForm = document.createElement("div");
 		this.dataForm.classList.add("row");
@@ -52,14 +52,10 @@ class DataWarehouseScreen {
 			if (this.isAdd) {
 				fetch("/api/data/" + this.id, {
 					method: "POST",
-					headers: {
-						"Content-Type": "application/json",
-						Authorization:
-							"Bearer " + JSON.parse(sessionStorage.auth).accessToken,
-					},
+					headers: window.ApplicationHeader(),
 					body: JSON.stringify(value),
 				})
-					.then((created) => {
+					.then(() => {
 						this.showDataPage();
 					})
 					.catch(() => {
@@ -73,14 +69,10 @@ class DataWarehouseScreen {
 
 				fetch(enpoint, {
 					method: "PUT",
-					headers: {
-						"Content-Type": "application/json",
-						Authorization:
-							"Bearer " + JSON.parse(sessionStorage.auth).accessToken,
-					},
+					headers: window.ApplicationHeader(),
 					body: JSON.stringify(value),
 				})
-					.then((created) => {
+					.then(() => {
 						this.showDataPage();
 					})
 					.catch(() => {
@@ -91,10 +83,10 @@ class DataWarehouseScreen {
 			// this.showDataPage();
 		});
 
+		console.log(window.ApplicationHeader());
+
 		fetch("/api/schema/" + this.id, {
-			headers: {
-				Authorization: "Bearer " + JSON.parse(sessionStorage.auth).accessToken,
-			},
+			headers: window.ApplicationHeader(),
 		})
 			.then((response) => response.json())
 			.then((schemas) => {
@@ -104,28 +96,6 @@ class DataWarehouseScreen {
 				console.error("No Schema found for " + this.id);
 			});
 	}
-
-	// setSchemas(schemas) {
-	// 	if (schemas && schemas.length !== 0) {
-	// 		this.schemas = schemas;
-	// 		this.rootSchemas = schemas.filter((schema) => schema["ids"]);
-	// 		this.setSelectedSchema(this.rootSchemas[0]);
-	// 	} else {
-	// 		document.getElementById("content").innerHTML = `<main class="p-5 m-5">
-
-	// 		<p class="lead">
-	// 		There are no schema available.
-	// 		</p>
-	// 		<p class="lead">
-	// 		  <a href="#" class="btn btn-primary fw-bold">Create New</a>
-	// 		</p>
-	// 	  </main>`;
-	// 		document.querySelector(".btn-primary").addEventListener("click", () => {
-	// 			document.querySelector("ul.call-to-action").classList.remove("d-none");
-	// 			this.schemaEditor.createSchema();
-	// 		});
-	// 	}
-	// }
 
 	setSelectedSchema(schema) {
 		this.schema = schema;
@@ -194,9 +164,7 @@ class DataWarehouseScreen {
 		}
 
 		fetch("/api/schema/" + this.schema["$id"] + "?enlarged", {
-			headers: {
-				Authorization: "Bearer " + JSON.parse(sessionStorage.auth).accessToken,
-			},
+			headers: window.ApplicationHeader(),
 		})
 			.then((response) => response.json())
 			.then((enlargedSchema) => {
@@ -241,10 +209,10 @@ class DataWarehouseScreen {
 			requestVariable = "?size=3";
 		}
 
+		console.log(window.ApplicationHeader());
+
 		fetch("/api/data/" + this.schema["$id"] + requestVariable, {
-			headers: {
-				Authorization: "Bearer " + JSON.parse(sessionStorage.auth).accessToken,
-			},
+			headers: window.ApplicationHeader(),
 		})
 			.then((response) => response.json())
 			.then((dataPage) => {
@@ -365,10 +333,7 @@ class DataWarehouseScreen {
 								this.getDataEndpoint(this.dataPage.content[selectedIndex]),
 							{
 								method: "DELETE",
-								headers: {
-									Authorization:
-										"Bearer " + JSON.parse(sessionStorage.auth).accessToken,
-								},
+								headers: window.ApplicationHeader(),
 							}
 						)
 							.then(() => {

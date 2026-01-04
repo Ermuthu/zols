@@ -90,6 +90,71 @@ class Core {
 		window.info = (statusMesaage) => {
 			showStatus("info", statusMesaage);
 		};
+
+		window.ApplicationHeader = () => {
+			const header = {
+				"content-type": "application/json",
+			};
+			if (sessionStorage.auth) {
+				header["Authorization"] =
+					"Bearer " + JSON.parse(sessionStorage.auth).accessToken;
+			}
+			if (window.LANGUAGE != null && window.LANGUAGE !== "en") {
+				header["Accept-Language"] = window.LANGUAGE;
+			}
+
+			console.log(window.LANGUAGE);
+
+			return header;
+		};
+
+		this.handleLanguage();
+		this.applyAcceptLanguageHeaders();
+	}
+
+	handleLanguage() {
+		const selectedLanguage = document.getElementById("selectedLanguage");
+		const languageOptions = document.querySelectorAll(".language-option");
+
+		const savedLanguage = localStorage.getItem("selectedLanguage");
+		if (savedLanguage) {
+			selectedLanguage.textContent = document.querySelector(
+				"[data-langcode='" + savedLanguage + "']"
+			).textContent;
+		}
+
+		window.LANGUAGE = "en" === savedLanguage ? null : savedLanguage;
+
+		languageOptions.forEach((option) => {
+			option.addEventListener("click", (e) => {
+				e.preventDefault();
+				const lang = option.dataset.langcode;
+				selectedLanguage.textContent = document.querySelector(
+					"[data-langcode='" + lang + "']"
+				).textContent;
+
+				localStorage.setItem("selectedLanguage", lang);
+
+				this.applyAcceptLanguageHeaders();
+			});
+		});
+	}
+
+	applyAcceptLanguageHeaders() {
+		const savedLanguage = localStorage.getItem("selectedLanguage");
+
+		const langCode = savedLanguage === "Tamil" ? "ta" : "en";
+
+		if (window.axios) {
+			window.axios.defaults.headers.common["Accept-Language"] = langCode;
+		}
+
+		const originalFetch = window.fetch;
+		window.fetch = function (url, options = {}) {
+			options.headers = options.headers || {};
+			options.headers["Accept-Language"] = langCode;
+			return originalFetch(url, options);
+		};
 	}
 }
 new Core();
